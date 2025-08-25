@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -29,17 +30,14 @@ class AuthController extends Controller
     {
         $credentials = $request->only('email', 'password');
 
-        if (!$user = User::where('email', $credentials['email'])->first()) {
-            return response()->json(['error' => 'Usuário não encontrado'], 404);
-        }
-
         if (!auth()->attempt($credentials)) {
             return response()->json(['error' => 'Credenciais inválidas'], 401);
         }
 
-        // Gerar código 2FA (ex: 6 dígitos aleatórios)
-        $code = rand(100000, 999999);
+        $user = auth()->user();
 
+        // Gerar código 2FA
+        $code = rand(100000, 999999);
         $user->two_factor_code = $code;
         $user->two_factor_expires_at = now()->addMinutes(10);
         $user->save();
@@ -49,11 +47,17 @@ class AuthController extends Controller
             $message->to($user->email)->subject('Código de Verificação');
         });
 
+        // Gerar token temporário para 2FA (expira em 10 min)
+        $tempToken = Str::random(40);
+        cache()->put("2fa_temp_{$tempToken}", $user->id, 600);
+
         return response()->json([
             'message' => 'Código enviado para seu e-mail',
-            '2fa_required' => true
+            '2fa_required' => true,
+            'temp_token' => $tempToken
         ]);
     }
+
 
 
     public function me()
@@ -84,47 +88,7 @@ class AuthController extends Controller
         ]);
     }
 
-    public function verify2FA(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email',
-            'code'  => 'required'
-        ]);
 
-        $user = User::where('email', $request->email)->first();
-
-        if (!$user || $user->two_factor_code !== $request->code) {
-            return response()->json(['error' => 'Código inválido'], 401);
-        }
-
-        if ($user->two_factor_expires_at->lt(now())) {
-            return response()->json(['error' => 'Código expirado'], 401);
-        }
-
-        // Limpa código
-        $user->two_factor_code = null;
-        $user->two_factor_expires_at = null;
-        $user->save();
-
-        // Gera JWT de acesso
-        $accessToken = auth()->login($user);
-
-        // Cria refresh token para múltiplos dispositivos
-        $refreshToken = RefreshToken::create([
-            'user_id' => $user->id,
-            'token' => base64_encode(Str::random(40)),
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->header('User-Agent'),
-            'expires_at' => now()->addDays(30)
-        ]);
-
-        return response()->json([
-            'access_token'  => $accessToken,
-            'refresh_token' => $refreshToken->token,
-            'token_type'    => 'bearer',
-            'expires_in'    => auth()->factory()->getTTL() * 60
-        ]);
-    }
 
     public function refreshToken(Request $request)
     {
@@ -142,6 +106,40 @@ class AuthController extends Controller
             'refresh_token' => $refreshToken->token,
             'token_type' => 'bearer',
             'expires_in' => auth()->factory()->getTTL() * 60
+        ]);
+    }
+
+    public function verify2FA(Request $request)
+    {
+        Log::info($request->all());
+        $request->validate([
+            'temp_token' => 'required|string',
+            'code' => 'required'
+        ]);
+
+        $userId = cache()->get("2fa_temp_{$request->temp_token}");
+        dd($userId);
+        if (!$userId) {
+            return response()->json(['error' => 'Token expirado'], 401);
+        }
+
+        $user = User::find($userId);
+        if (!$user || $user->two_factor_code != $request->code) {
+            return response()->json(['error' => 'Código inválido'], 401);
+        }
+
+        // Limpa cache e código
+        cache()->forget("2fa_temp_{$request->temp_token}");
+        $user->two_factor_code = null;
+        $user->two_factor_expires_at = null;
+        $user->save();
+
+        $accessToken = auth()->login($user);
+        Log::info($accessToken);
+        return response()->json([
+            'access_token' => $accessToken,
+            'token_type' => 'bearer',
+            'expires_in' => JWTAuth::factory()->getTTL() * 60
         ]);
     }
 }

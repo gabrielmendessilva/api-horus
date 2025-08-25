@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ClienteController;
 use App\Models\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -19,3 +20,10 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/verify-2fa', [AuthController::class, 'verify2FA']);
 Route::post('/logout', [AuthController::class, 'logout']);
 
+
+Route::group(['middleware' => ['jwt.auth']], function () {
+    Route::prefix('cliente')->group(function () {
+        Route::get('listar', [ClienteController::class, 'index']);
+        Route::post('logout', [AuthController::class, 'logout']);
+    });
+});
