@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\RefreshToken;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -65,20 +66,6 @@ class AuthController extends Controller
         return response()->json(auth()->user());
     }
 
-    public function logout(Request $request)
-    {
-        $token = $request->input('refresh_token');
-        $refreshToken = RefreshToken::where('token', $token)->first();
-
-        if ($refreshToken) {
-            $refreshToken->update(['revoked' => true]);
-        }
-
-        return response()->json(['message' => 'Logout efetuado no dispositivo']);
-    }
-
-
-
     protected function respondWithToken($token)
     {
         return response()->json([
@@ -88,26 +75,6 @@ class AuthController extends Controller
         ]);
     }
 
-
-
-    public function refreshToken(Request $request)
-    {
-        $token = $request->input('refresh_token');
-        $refreshToken = RefreshToken::where('token', $token)->first();
-
-        if (!$refreshToken || !$refreshToken->isValid()) {
-            return response()->json(['error' => 'Invalid refresh token'], 401);
-        }
-
-        $accessToken = auth()->login($refreshToken->user);
-
-        return response()->json([
-            'access_token' => $accessToken,
-            'refresh_token' => $refreshToken->token,
-            'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 60
-        ]);
-    }
 
     public function verify2FA(Request $request)
     {
@@ -134,11 +101,13 @@ class AuthController extends Controller
         $user->save();
 
         $accessToken = JWTAuth::fromUser($user);
-
+        $expireIn = JWTAuth::factory()->getTTL() * 60;
+        $expireAt = Carbon::now()->addMinutes(JWTAuth::factory()->getTTL() * 60);
         return response()->json([
             'access_token' => $accessToken,
             'token_type' => 'bearer',
-            'expires_in' => JWTAuth::factory()->getTTL() * 60
+            'expires_in' => $expireIn,
+            'expires_at' => $expireAt->toDateTimeString()
         ]);
     }
 }
