@@ -23,7 +23,8 @@ Route::post('/logout', [AuthController::class, 'logout']);
 
 Route::group(['middleware' => ['jwt.auth']], function () {
     Route::prefix('cliente')->group(function () {
-        Route::get('listar', [ClienteController::class, 'index']);
+        Route::get('index', [ClienteController::class, 'index']);
+        Route::get('show', [ClienteController::class, 'show']);
         Route::post('logout', [AuthController::class, 'logout']);
     });
 });
