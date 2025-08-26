@@ -49,13 +49,14 @@ class AuthController extends Controller
 
         // Gerar token temporário para 2FA (expira em 10 min)
         $tempToken = Str::random(40);
-        Log::info('temp_token_'.$tempToken);
+        Log::info('temp_token_'.$tempToken. '_____'.$user->id);
         cache()->put("2fa_temp_{$tempToken}", $user->id, 600);
 
         return response()->json([
             'message' => 'Código enviado para seu e-mail',
             '2fa_required' => true,
-            'temp_token' => $tempToken
+            'temp_token' => $tempToken,
+            'user_id' => $user->id
         ]);
     }
 
