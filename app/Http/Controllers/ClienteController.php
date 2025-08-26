@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\ClienteService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class ClienteController extends Controller
 {
@@ -19,6 +20,7 @@ class ClienteController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
+            Log::info($request->all());
             $data = $this->clientService->index($request);
             return response()
                 ->json($data, 200);

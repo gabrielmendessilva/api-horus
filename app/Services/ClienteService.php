@@ -15,7 +15,7 @@ class ClienteService
     public function index(Request $request)
     {
         return Client::query()
-            ->with('ultimoAcerto')
+            ->with('ultimaNota')
             ->when($request->get('nome'), function ($query, $nome) {
                 $query->where('NOME_CLI', 'like', '%' . $nome . '%');
             })
@@ -34,6 +34,7 @@ class ClienteService
             ->when($request->get('top'), function ($query, $top) {
                 $query->take(10);
             })
+            ->orderBy('COD_CLI', 'DESC')
             ->get();
     }
 }

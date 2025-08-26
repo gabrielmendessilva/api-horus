@@ -17,6 +17,6 @@ class Client extends Model
     {
         return $this->hasOne(NfMestre::class, 'COD_CLI', 'COD_CLI')
                     ->where('COD_NATUREZA', '6.113')
-                    ->latest('DAT_EMISSAO_NFE');
+                    ->latest('DAT_EMISSAO_NF');
     }
 }
