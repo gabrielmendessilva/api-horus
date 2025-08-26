@@ -49,6 +49,7 @@ class AuthController extends Controller
 
         // Gerar token temporário para 2FA (expira em 10 min)
         $tempToken = Str::random(40);
+        Log::info('temp_token_'.$tempToken);
         cache()->put("2fa_temp_{$tempToken}", $user->id, 600);
 
         return response()->json([
@@ -57,8 +58,6 @@ class AuthController extends Controller
             'temp_token' => $tempToken
         ]);
     }
-
-
 
     public function me()
     {
@@ -118,7 +117,6 @@ class AuthController extends Controller
         ]);
 
         $userId = cache()->get("2fa_temp_{$request->temp_token}");
-        dd($userId);
         if (!$userId) {
             return response()->json(['error' => 'Token expirado'], 401);
         }
@@ -134,8 +132,8 @@ class AuthController extends Controller
         $user->two_factor_expires_at = null;
         $user->save();
 
-        $accessToken = auth()->login($user);
-        Log::info($accessToken);
+        $accessToken = JWTAuth::fromUser($user);
+
         return response()->json([
             'access_token' => $accessToken,
             'token_type' => 'bearer',
