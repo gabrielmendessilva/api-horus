@@ -6,7 +6,7 @@ use App\Models\Client;
 use App\Models\SalesRepresentative;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Support\Facades\Log;
 class ClienteService
 {
     /**
@@ -16,6 +16,7 @@ class ClienteService
 
     public function index(Request $request)
     {
+        Log::info(Auth()->user());
         return Client::query()
             ->with('ultimaNota')
             ->when($request->get('nome'), function ($query, $nome) {
@@ -38,7 +39,7 @@ class ClienteService
             })
             ->when(Auth()->user()->sales_representative, function ($query) {
                 $codResp = SalesRepresentative::where('user_id', Auth()->user()->id)->first();
-                $query->where('COD_RESPONSAVEL', $codResp);
+                $query->where('COD_RESPONSAVEL', $codResp->code_sales);
             })
 
             ->orderBy('COD_CLI', 'DESC')

@@ -99,10 +99,9 @@ class AuthController extends Controller
         $user->two_factor_code = null;
         $user->two_factor_expires_at = null;
         $user->save();
-
         $accessToken = JWTAuth::fromUser($user);
         $expireIn = JWTAuth::factory()->getTTL() * 60;
-        $expireAt = Carbon::now()->addMinutes(JWTAuth::factory()->getTTL() * 60);
+        $expireAt = Carbon::now('America/Sao_Paulo')->addMinutes(JWTAuth::factory()->getTTL() * 60);
         return response()->json([
             'access_token' => $accessToken,
             'token_type' => 'bearer',

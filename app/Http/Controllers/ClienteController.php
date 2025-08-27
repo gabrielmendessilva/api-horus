@@ -25,6 +25,7 @@ class ClienteController extends Controller
             return response()
                 ->json($data, 200);
         } catch (\Throwable $th) {
+            Log::info($th->getMessage());
             return response()
                 ->json([
                     'message' => $th->getMessage()], 400);
