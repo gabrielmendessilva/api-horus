@@ -3,7 +3,9 @@
 namespace App\Services;
 
 use App\Models\Client;
+use App\Models\SalesRepresentative;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ClienteService
 {
@@ -34,6 +36,11 @@ class ClienteService
             ->when($request->get('top'), function ($query, $top) {
                 $query->take(10);
             })
+            ->when(Auth()->user()->sales_representative, function ($query) {
+                $codResp = SalesRepresentative::where('user_id', Auth()->user()->id)->first();
+                $query->where('COD_RESPONSAVEL', $codResp);
+            })
+
             ->orderBy('COD_CLI', 'DESC')
             ->get();
     }
