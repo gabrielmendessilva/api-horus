@@ -35,7 +35,7 @@ class ClienteController extends Controller
     public function show(Request $request): JsonResponse
     {
         try {
-            $data = $this->clientService->index($request);
+            $data = $this->clientService->show($request);
             return response()
                 ->json($data, 200);
         } catch (\Throwable $th) {

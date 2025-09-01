@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClienteController;
+use App\Http\Controllers\ConsignacaoController;
 use App\Models\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -24,10 +25,17 @@ Route::post('/logout', [AuthController::class, 'logout']);
 Route::group(['middleware' => ['jwt.auth']], function () {
     Route::prefix('cliente')->group(function () {
         Route::post('index', [ClienteController::class, 'index']);
-        Route::get('show', [ClienteController::class, 'show']);
+        Route::post('show', [ClienteController::class, 'show']);
         Route::post('logout', [AuthController::class, 'logout']);
-        Route::post('me', function(){
+        Route::post('me', function () {
             return auth()->user();
         });
+    });
+    Route::prefix('consignacao')->group(function () {
+        Route::post('/contratos', [ConsignacaoController::class, 'listarContratos'])
+            ->name('consignacao.contratos');
+
+        Route::post('/adm/consignacao/mapa', [ConsignacaoController::class, 'gerarMapa'])
+            ->name('consignacao.mapa');
     });
 });
