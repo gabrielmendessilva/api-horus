@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\ConsignacaoController;
+use App\Http\Controllers\FinanceiroController;
 use App\Models\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -35,8 +36,13 @@ Route::group(['middleware' => ['jwt.auth']], function () {
     Route::prefix('consignacao')->group(function () {
         Route::post('/contratos', [ConsignacaoController::class, 'listarContratos'])
             ->name('consignacao.contratos');
-
         Route::post('/mapa', [ConsignacaoController::class, 'gerarMapa'])
             ->name('consignacao.mapa');
     });
+
+    Route::prefix('financeiro')->group(function () {
+        Route::post('/boletos', [FinanceiroController::class, 'listarBoletos'])
+            ->name('financeiro.listarBoletos');
+    });
+
 });
