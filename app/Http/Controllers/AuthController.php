@@ -106,7 +106,8 @@ class AuthController extends Controller
             'access_token' => $accessToken,
             'token_type' => 'bearer',
             'expires_in' => $expireIn,
-            'expires_at' => $expireAt->toDateTimeString()
+            'expires_at' => $expireAt->toDateTimeString(),
+            'sales' => $user->sales_representative
         ]);
     }
 }
