@@ -25,6 +25,7 @@ Route::post('/logout', [AuthController::class, 'logout']);
 Route::group(['middleware' => ['jwt.auth']], function () {
     Route::prefix('cliente')->group(function () {
         Route::post('index', [ClienteController::class, 'index']);
+        Route::post('getInfos', [ClienteController::class, 'getInfos']);
         Route::post('show', [ClienteController::class, 'show']);
         Route::post('logout', [AuthController::class, 'logout']);
         Route::post('me', function () {
@@ -35,7 +36,7 @@ Route::group(['middleware' => ['jwt.auth']], function () {
         Route::post('/contratos', [ConsignacaoController::class, 'listarContratos'])
             ->name('consignacao.contratos');
 
-        Route::post('/adm/consignacao/mapa', [ConsignacaoController::class, 'gerarMapa'])
+        Route::post('/mapa', [ConsignacaoController::class, 'gerarMapa'])
             ->name('consignacao.mapa');
     });
 });

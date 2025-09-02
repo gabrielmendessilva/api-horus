@@ -43,4 +43,16 @@ class ClienteController extends Controller
                 ->json($th->getMessage(), 400);
         }
     }
+
+    public function getInfos(Request $request): JsonResponse
+    {
+        try {
+            $data = $this->clientService->getInfos($request->get('codCli'));
+            return response()
+                ->json($data, 200);
+        } catch (\Throwable $th) {
+            return response()
+                ->json($th->getMessage(), 400);
+        }
+    }
 }

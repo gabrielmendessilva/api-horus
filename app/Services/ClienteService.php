@@ -51,33 +51,40 @@ class ClienteService
     public function show(Request $request)
     {
         $data = Client::query()
-        ->from('VW_CLIENTES as vc')
-        ->join('PEDIDOS_VENDA as pv', 'vc.COD_CLI', '=', 'pv.COD_CLI')              // INNER (garante pedidos do cliente)
-        ->leftJoin('PARAMETROS_FISCAIS as pf', 'pv.COD_PARAM_FISCAL', '=', 'pf.COD_PARAM_FISCAL') // LEFT
-        ->leftJoin('NF_MESTRE as nfm', 'pv.COD_PED_VENDA', '=', 'nfm.COD_PED_VENDA')             // LEFT
-        ->leftJoin('USUARIOS as u', 'vc.COD_RESPONSAVEL', '=', 'u.COD_USU')             // LEFT
-        ->where('pv.COD_CLI', $request->get('id'))
-        ->select([
-            'vc.*',
-            'pv.COD_PED_VENDA',
-            'pv.DAT_PEDIDO',
-            'pf.DESC_PARAM_FISCAL',
-            'pv.QTD_ITENS_TOTAL',
-            'pv.QTD_ITENS_ATENDIDOS',
-            'pv.VLR_TOTAL_LIQUIDO',
-            'pv.STATUS_PEDIDO_VENDA',
-            'nfm.NRO_NOTA_FISCAL',
-            'u.NOM_USU'
-        ])->limit(20)
-        ->orderBy('pv.DAT_PEDIDO', 'DESC')
-        ->get();
+            ->from('VW_CLIENTES as vc')
+            ->join('PEDIDOS_VENDA as pv', 'vc.COD_CLI', '=', 'pv.COD_CLI')              // INNER (garante pedidos do cliente)
+            ->leftJoin('PARAMETROS_FISCAIS as pf', 'pv.COD_PARAM_FISCAL', '=', 'pf.COD_PARAM_FISCAL') // LEFT
+            ->leftJoin('NF_MESTRE as nfm', 'pv.COD_PED_VENDA', '=', 'nfm.COD_PED_VENDA')             // LEFT
+            ->leftJoin('USUARIOS as u', 'vc.COD_RESPONSAVEL', '=', 'u.COD_USU')             // LEFT
+            ->where('pv.COD_CLI', $request->get('id'))
+            ->select([
+                'vc.*',
+                'pv.COD_PED_VENDA',
+                'pv.DAT_PEDIDO',
+                'pf.DESC_PARAM_FISCAL',
+                'pv.QTD_ITENS_TOTAL',
+                'pv.QTD_ITENS_ATENDIDOS',
+                'pv.VLR_TOTAL_LIQUIDO',
+                'pv.STATUS_PEDIDO_VENDA',
+                'nfm.NRO_NOTA_FISCAL',
+                'u.NOM_USU'
+            ])->limit(20)
+            ->orderBy('pv.DAT_PEDIDO', 'DESC')
+            ->get();
 
-        if (Auth()->user()->sales_representative &&
-        isset($data[0]) &&
-        $data[0]['COD_RESPONSAVEL'] !=
-        SalesRepresentative::where('user_id', Auth()->user()->id)->first()->code_sales) {
+        if (
+            Auth()->user()->sales_representative &&
+            isset($data[0]) &&
+            $data[0]['COD_RESPONSAVEL'] !=
+            SalesRepresentative::where('user_id', Auth()->user()->id)->first()->code_sales
+        ) {
             throw new Exception("Este cliente não pertence ao vendedor");
         }
         return $data;
+    }
+
+    public function getInfos(int $codCli): object
+    {
+        return Client::where('COD_CLI', $codCli)->first();
     }
 }
