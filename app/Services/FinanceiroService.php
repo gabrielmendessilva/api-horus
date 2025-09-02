@@ -3,12 +3,14 @@
 namespace App\Services;
 
 use App\Models\Client;
+use App\Models\ContasReceberAgr;
 use App\Models\ContratoConsignacao;
 use App\Models\ItensConsignacao;
 use App\Models\SalesRepresentative;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class FinanceiroService
@@ -18,29 +20,29 @@ class FinanceiroService
      */
     public function __construct() {}
 
-    public function getContrato(int $id): object
+    public function listarBoletos(string $vencimento): array
     {
-        $contratos = ContratoConsignacao::where('COD_CLI', $id)
-            ->where('STA_CTR', 'B')
+        $boletos = ContasReceberAgr::whereRaw("CONVERT(DATE, CONVERT(DATETIME, DAT_VENC_CRECEBER, 120)) = ?", [$vencimento])
+            ->where('STA_LANCTO_CRECEBER', 'AB')
+            ->with('cliente')
+            ->distinct('NRO_LANCTO_DESTINO')
             ->get();
 
-        return $contratos;
+        $lancamentosIndividuais = $this->boletosLancamentos($vencimento);
+
+        return [
+            'boletos' => $boletos,
+            'lancamentosIndividuais' => $lancamentosIndividuais,
+        ];
     }
 
-    public function getItens(int $contrato): object
+    private function boletosLancamentos(string $vencimento): object
     {
-        return ItensConsignacao::query()
-            ->from('VW_ITENS_CONSIGNACAO as vic')
-            ->join('view_product as vp', 'vic.COD_ITEM', 'vp.code')
-            ->where('vic.COD_CTR', $contrato)
-            ->select(
-                'vic.COD_CLI',
-                'vic.COD_ITEM',
-                'vic.NOME_ITEM',
-                'vp.sku',
-                'vic.SALDO',
-                'vic.VLR_PRECO',
-                'vic.VLR_DESCONTO'
-            )->get();
+        return ContasReceberAgr::query()
+            ->select(['NRO_LANCTO_DESTINO', DB::raw("STRING_AGG(CONVERT(varchar(50), NRO_LANCTO_CRECEBER), ',') AS nros_individuais_csv")])
+            ->whereRaw("CONVERT(date, TRY_CONVERT(datetime, DAT_VENC_CRECEBER, 120)) = ?", [$vencimento])
+            ->where('STA_LANCTO_CRECEBER', 'AB')
+            ->groupBy('NRO_LANCTO_DESTINO')
+            ->get();
     }
 }

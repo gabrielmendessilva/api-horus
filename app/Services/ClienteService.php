@@ -7,6 +7,7 @@ use App\Models\SalesRepresentative;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class ClienteService
@@ -60,7 +61,7 @@ class ClienteService
             ->select([
                 'vc.*',
                 'pv.COD_PED_VENDA',
-                'pv.DAT_PEDIDO',
+                'pv.DAT_ULT_ATL',
                 'pf.DESC_PARAM_FISCAL',
                 'pv.QTD_ITENS_TOTAL',
                 'pv.QTD_ITENS_ATENDIDOS',
@@ -68,8 +69,19 @@ class ClienteService
                 'pv.STATUS_PEDIDO_VENDA',
                 'nfm.NRO_NOTA_FISCAL',
                 'u.NOM_USU'
-            ])->limit(20)
+            ])
+            ->addSelect([
+                // Data da última NF (por cliente) com COD_NATUREZA = '6.113'
+                'ULTIMA_NF_DATA' => DB::connection('sqlsrv')
+            ->table('NF_MESTRE as nfm2')
+            ->selectRaw('TOP 1 nfm2.DAT_EMISSAO_NF')
+            ->whereColumn('nfm2.COD_CLI', 'vc.COD_CLI')
+            ->where('nfm2.COD_NATUREZA', 6.113) // se for decimal no banco, deixe sem aspas
+            ->latest('DAT_EMISSAO_NF')
+            // ->orderByDesc('nfm2.DAT_EMISSAO_NF'),
+            ])
             ->orderBy('pv.DAT_PEDIDO', 'DESC')
+            ->limit(20)
             ->get();
 
         if (
