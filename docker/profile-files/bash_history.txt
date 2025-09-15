@@ -1,0 +1,139 @@
+lsblk -a
+uname -a
+cat /etc/*release
+sudo apt install hstr
+apt update
+sudo apt update
+sudo apt install hstr
+hstr 
+hstr --show-configuration >> ~/.bashrc && . ~/.bashrc
+source ~/.bashrc 
+cat ~/.bashrc 
+composer i
+composer u
+composer u
+composer u
+php artisan make:model TokenMaxiPago
+composer dump
+composer dump
+composer dump
+composer update
+composer require nmred/kafka-php
+composer require nmred/kafka-php:^0.2.0
+composer self-update
+rm composer.lock
+composer install
+composer require mateusjunges/laravel-kafka
+php artisan vendor:publish --tag=laravel-kafka-config
+php artisan make:command KafkaConsumer
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+env('KAFKA_TOPIC_IMPLANTACAO_VENDA')
+php artisan tin
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+Cache::clear()
+php artisan kafka:consume
+php artisan tin
+php artisan tin
+php artisan tin
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+composer show mateusjunges/laravel-kafka
+composer require longlang/phpkafka
+composer require longlang/phpkafka --with-all-dependencies
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan make:model CustomAvroDeserializer
+php -m
+composer require fgrosse/php-avro
+composer require flix-tech/avro-php
+composer require landoop/schema-registry phpkafka/phpkafka
+composer require flix-tech/avro-serde-php
+php artisan make:model AvroToJsonConverter
+composer dump
+composer remove flix-tech/avro-php
+composer remove flix-tech/avro-serde-php
+composer dump
+composer i
+composer update
+composer dump
+php artisan kafka:consume
+php artisan kafka:consume
+php artisan kafka:consume
