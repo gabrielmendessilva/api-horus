@@ -36,7 +36,7 @@ class EnviarBoletoLoteHorus extends Command
             ->get()
             ->each(function (ContasReceberAgr $nroLanc) {
                 try {
-                    $filePath = "/mnt/z/EXE/Boletos/0101000000{$nroLanc->NRO_LANCTO_DESTINO}01.pdf";
+                    $filePath = "//192.168.0.99/mnt/HORUS/EXE/Boletos/0101000000{$nroLanc->NRO_LANCTO_DESTINO}01.pdf";
                     echo $nroLanc->COD_NF . " - " . $nroLanc->DAT_VENC_CRECEBER . PHP_EOL;
                     if (!file_exists($filePath)) {
                         throw new Exception("Arquivo não encontrado em: {$filePath}");
@@ -46,7 +46,7 @@ class EnviarBoletoLoteHorus extends Command
                         'vencimento' => $nroLanc->DAT_VENC_CRECEBER,
                         'valor' => $notaFiscal['total_lanc'],
                     ];
-                    Mail::to(['mendes.gabriel@icloud.com', 'uriel@martinclaret.com.br'])
+                    Mail::to(['mendes.gabriel@icloud.com'])
                         ->send(new BoletoHorusMail($boleto, $notaFiscal['notas'], $filePath));
                 } catch (Exception $e) {
                     echo $e->getMessage() . PHP_EOL;

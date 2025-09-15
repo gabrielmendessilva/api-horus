@@ -41,6 +41,7 @@ class ClienteService
                 $query->take(10);
             })
             ->when(Auth()->user()->sales_representative, function ($query) {
+                Log::info( Auth()->user());
                 $codResp = SalesRepresentative::where('user_id', Auth()->user()->id)->first();
                 $query->where('COD_RESPONSAVEL', $codResp->code_sales);
             })
