@@ -4,11 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ContasReceberAgr extends Model
+class ContasReceber extends Model
 {
-    //agrupado
     protected $connection = 'sqlsrv';
-    protected $table = "LANCTOS_CRECEBER_AGR";
+    protected $table = "LANCTOS_CRECEBER";
 
     public function cliente()
     {

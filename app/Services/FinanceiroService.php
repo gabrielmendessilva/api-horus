@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Client;
 use App\Models\ContasReceberAgr;
+use App\Models\ContasReceberLinkBoletos;
 use App\Models\ContratoConsignacao;
 use App\Models\ItensConsignacao;
 use App\Models\SalesRepresentative;
@@ -22,27 +23,15 @@ class FinanceiroService
 
     public function listarBoletos(string $vencimento): array
     {
-        $boletos = ContasReceberAgr::whereRaw("CONVERT(DATE, CONVERT(DATETIME, DAT_VENC_CRECEBER, 120)) = ?", [$vencimento])
+        $boletos = ContasReceberLinkBoletos::query()
+            ->whereDate('DAT_VENC_CRECEBER', $vencimento)
             ->where('STA_LANCTO_CRECEBER', 'AB')
-            ->with('cliente')
-            ->distinct('NRO_LANCTO_DESTINO')
+            ->with([
+                'cliente',
+                'agrupados:NRO_LANCTO_DESTINO,NRO_LANCTO_CRECEBER',
+            ])
             ->get();
 
-        $lancamentosIndividuais = $this->boletosLancamentos($vencimento);
-
-        return [
-            'boletos' => $boletos,
-            'lancamentosIndividuais' => $lancamentosIndividuais,
-        ];
-    }
-
-    private function boletosLancamentos(string $vencimento): object
-    {
-        return ContasReceberAgr::query()
-            ->select(['NRO_LANCTO_DESTINO', DB::raw("STRING_AGG(CONVERT(varchar(50), NRO_LANCTO_CRECEBER), ',') AS nros_individuais_csv")])
-            ->whereRaw("CONVERT(date, TRY_CONVERT(datetime, DAT_VENC_CRECEBER, 120)) = ?", [$vencimento])
-            ->where('STA_LANCTO_CRECEBER', 'AB')
-            ->groupBy('NRO_LANCTO_DESTINO')
-            ->get();
+        return ['boletos' => $boletos];
     }
 }
